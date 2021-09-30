@@ -51,3 +51,7 @@ export default function TodoPage({ id }: { id: string }) {
   return <div>{data?.title}</div>;
 }
 ```
+
+## Credits
+
+- Alex Katt for tRPC. This project is heavily inspired by `trpc`.
