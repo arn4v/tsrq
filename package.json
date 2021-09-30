@@ -1,4 +1,6 @@
 {
+  "name": "tsquery",
+  "author": "Arnav Gosain",
   "version": "0.0.1",
   "license": "MIT",
   "main": "dist/index.js",
@@ -31,8 +33,6 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "typed-query",
-  "author": "Arnav Gosain",
   "module": "dist/typed-query.esm.js",
   "size-limit": [
     {
