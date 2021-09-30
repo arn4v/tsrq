@@ -9,24 +9,81 @@ import {
 } from 'react-query';
 import { Await, UnknownInstance } from '../types';
 
-export function createReactQueryHooks<TInstance extends UnknownInstance>(
+export function createUseMutation<TInstance extends UnknownInstance>(
   instance: TInstance
 ) {
+  const mutationFetchers = instance.opts.mutations;
+  type MutationKeys = keyof TInstance['opts']['mutations'] & string;
+  type MutationFetchers = TInstance['opts']['mutations'];
+
+  const useMutation = <
+    TKey extends MutationKeys,
+    TVariables = Parameters<MutationFetchers[TKey]>[0],
+    TData = Await<ReturnType<MutationFetchers[TKey]>>
+  >(
+    key: TKey,
+    options?: UseMutationOptions<TData, unknown, TVariables>
+  ) => {
+    return useReactMutation(
+      key,
+      (mutationFetchers[key] as unknown) as MutationFunction<TData, TVariables>,
+      options
+    );
+  };
+
+  return useMutation;
+}
+
+export function createUseQuery<TInstance extends UnknownInstance>(
+  instance: TInstance
+) {
+  const queryFetchers = instance.opts.queries;
   type QueryKeys = keyof TInstance['opts']['queries'] & string;
   type Fetchers = TInstance['opts']['queries'];
-  const queryFetchers = instance.opts.queries;
+
+  // function useQuery<
+  //   Key extends QueryKeys,
+  //   Params = Parameters<Fetchers[Key]>,
+  //   Data = Await<ReturnType<Fetchers[Key]>>
+  // >(key: Key, options?: UseQueryOptions<Data>): UseQueryResult<Data>;
+
+  // function useQuery<
+  //   Key extends QueryKeys,
+  //   Params = Parameters<typeof queryFetchers[Key]>,
+  //   Data = Await<ReturnType<typeof queryFetchers[Key]>>
+  // >(
+  //   key: Key,
+  //   params: Params,
+  //   options?: UseQueryOptions<Data>
+  // ): UseQueryResult<Data>;
 
   function useQuery<
     Key extends QueryKeys,
+    Data = Await<ReturnType<Fetchers[Key]>>,
+    Params = Parameters<Fetchers[Key]> extends []
+      ? never
+      : Parameters<Fetchers[Key]>
+  >(key: Key, params: Params): UseQueryResult<Data>;
+
+  function useQuery<
+    Key extends QueryKeys,
+    Data = Await<ReturnType<Fetchers[Key]>>,
+    Options = UseQueryOptions<Data>
+  >(key: Key, options?: Options): UseQueryResult<Data>;
+
+  function useQuery<
+    Key extends QueryKeys,
+    Data = Await<ReturnType<Fetchers[Key]>>,
     Params = Parameters<Fetchers[Key]> extends []
       ? never
       : Parameters<Fetchers[Key]>,
-    Data = Await<ReturnType<Fetchers[Key]>>
+    Options = UseQueryOptions<Data>
   >(
-    key: Key,
-    arg2: Params extends never ? UseQueryOptions<Data> : Params,
-    arg3?: Params extends never ? never : UseQueryOptions<Data, unknown, Data>
+    arg1: Key,
+    arg2?: Params extends never ? Options : Params,
+    arg3?: Params extends never ? Options : Options
   ): UseQueryResult<Data> {
+    const key = React.useMemo(() => arg1, [arg1]);
     const params = React.useMemo(() => (Array.isArray(arg2) ? arg2 : []), [
       arg2,
     ]);
@@ -42,21 +99,5 @@ export function createReactQueryHooks<TInstance extends UnknownInstance>(
     );
   }
 
-  type MutationKeys = keyof TInstance['opts']['mutations'] & string;
-  type MutationFetchers = TInstance['opts']['mutations'];
-  const mutationFetchers = instance.opts.mutations;
-
-  function useMutation<
-    TKey extends MutationKeys,
-    TVariables = Parameters<MutationFetchers[TKey]>[0],
-    TData = Await<ReturnType<MutationFetchers[TKey]>>
-  >(key: TKey, options?: UseMutationOptions<TData, unknown, TVariables>) {
-    return useReactMutation(
-      key,
-      (mutationFetchers[key] as unknown) as MutationFunction<TData, TVariables>,
-      options
-    );
-  }
-
-  return { useQuery, useMutation };
+  return useQuery;
 }

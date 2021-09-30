@@ -13,19 +13,13 @@ class TypedQuery<TQueries, TMutations> {
     };
   }
 
-  public query<
-    TKey extends Readonly<string>,
-    TInput,
-    TOutput,
-    TFunc = (params: TInput) => Await<TOutput>
-  >(
+  public query<TKey extends string, TFunc extends (params: any) => any>(
     key: TKey,
-    fun: TFunc
+    func: TFunc
   ): TypedQuery<
     TQueries &
       {
-        // [key in keyof TKey]: TFunc;
-        [key in typeof key]: TFunc;
+        [key in typeof key]: typeof func;
       },
     TMutations
   > {
@@ -33,12 +27,12 @@ class TypedQuery<TQueries, TMutations> {
       ...this.opts,
       queries: {
         ...this.opts.queries,
-        [key]: fun,
+        [key]: func,
       },
     }) as TypedQuery<
       TQueries &
         {
-          [key in typeof key]: TFunc;
+          [key in typeof key]: typeof func;
         },
       TMutations
     >;
@@ -46,9 +40,7 @@ class TypedQuery<TQueries, TMutations> {
 
   public mutation<
     TKey extends Readonly<string>,
-    TInput,
-    TOutput,
-    TFunc = (params: TInput) => Await<TOutput>
+    TFunc extends (params: any) => any
   >(
     key: TKey,
     func: TFunc
