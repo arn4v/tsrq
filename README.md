@@ -9,18 +9,22 @@ With TSRQ, you only define you write code for your queries and mutations once an
 ## Example usage:
 
 ```tsx
-import { TypedQuery, createReactQueryHooks } from 'typed-query';
+import {
+  createQueryBuilder,
+  createUseQuery,
+  createUseMutation,
+} from 'typed-query';
 
 interface ITodo {
   id: string;
   title: string;
 }
 
-const tQuery = new TypedQuery()
-  .query('allTodos', async () => {
+const builder = createQueryBuilder()
+  .query('todos', async () => {
     return await fetch('/todos').then(res => res.json() as Array<ITodo>);
   })
-  .query('todoById', async (id: string) => {
+  .query('byId', async (id: string) => {
     return await fetch(`/todos/${id}`).then(res => res.json() as ITodo);
   })
   .mutation('updateTodo', async ({ id, title }: ITodo) => {
@@ -30,10 +34,11 @@ const tQuery = new TypedQuery()
     }).then(res => res.json() as ITodo);
   });
 
-const { useQuery, useMutation } = createReactQueryHooks<typeof tQuery>(tQuery);
+const useQuery = createUseQuery(builder);
+const useMutation = createUseMutation(builder);
 
 export default function TodosList() {
-  const { data } = useQuery('allTodos');
+  const { data } = useQuery('todos');
 
   return (
     <ul>
@@ -45,7 +50,7 @@ export default function TodosList() {
 }
 
 export default function TodoPage({ id }: { id: string }) {
-  const { data } = useQuery('todoById', id);
+  const { data } = useQuery('byId', id);
   const { mutate } = useMutation('updateTodo');
 
   return <div>{data?.title}</div>;

@@ -1,6 +1,6 @@
 import { UnknownInstance } from './types';
 
-class TypedQueryBuilder<TQueries, TMutations> {
+class QueryBuilder<TQueries, TMutations> {
   readonly fetchers: Readonly<{
     queries: TQueries;
     mutations: TMutations;
@@ -16,20 +16,20 @@ class TypedQueryBuilder<TQueries, TMutations> {
   public query<TKey extends string, TFunc extends Function>(
     key: TKey,
     func: TFunc
-  ): TypedQueryBuilder<
+  ): QueryBuilder<
     TQueries &
       {
         [key in typeof key]: typeof func;
       },
     TMutations
   > {
-    return new TypedQueryBuilder({
+    return new QueryBuilder({
       ...this.fetchers,
       queries: {
         ...this.fetchers.queries,
         [key]: func,
       },
-    }) as TypedQueryBuilder<
+    }) as QueryBuilder<
       TQueries &
         {
           [key in typeof key]: typeof func;
@@ -41,20 +41,20 @@ class TypedQueryBuilder<TQueries, TMutations> {
   public mutation<TKey extends Readonly<string>, TFunc extends Function>(
     key: TKey,
     func: TFunc
-  ): TypedQueryBuilder<
+  ): QueryBuilder<
     TQueries,
     TMutations &
       {
         [key in TKey]: TFunc;
       }
   > {
-    return new TypedQueryBuilder({
+    return new QueryBuilder({
       ...this.fetchers,
       mutations: {
         ...this.fetchers.mutations,
         [key]: func,
       },
-    }) as TypedQueryBuilder<
+    }) as QueryBuilder<
       TQueries,
       TMutations &
         {
@@ -65,11 +65,11 @@ class TypedQueryBuilder<TQueries, TMutations> {
 
   public merge<TBuilderInstance extends UnknownInstance>(
     builderInstance: TBuilderInstance
-  ): TypedQueryBuilder<
+  ): QueryBuilder<
     TQueries & TBuilderInstance['fetchers']['queries'],
     TMutations & TBuilderInstance['fetchers']['mutations']
   > {
-    return new TypedQueryBuilder({
+    return new QueryBuilder({
       queries: {
         ...this.fetchers.queries,
         ...builderInstance.fetchers.queries,
@@ -82,4 +82,4 @@ class TypedQueryBuilder<TQueries, TMutations> {
   }
 }
 
-export default TypedQueryBuilder;
+export const createQueryBuilder = () => new QueryBuilder();
