@@ -1,35 +1,35 @@
-import { Await } from './types';
+import { UnknownInstance } from './types';
 
-class TypedQuery<TQueries, TMutations> {
-  readonly opts: Readonly<{
+class TypedQueryBuilder<TQueries, TMutations> {
+  readonly fetchers: Readonly<{
     queries: TQueries;
     mutations: TMutations;
   }>;
 
   constructor(options: { queries?: TQueries; mutations?: TMutations } = {}) {
-    this.opts = {
+    this.fetchers = {
       queries: (options.queries ?? Object.create(null)) as TQueries,
       mutations: (options.mutations ?? Object.create(null)) as TMutations,
     };
   }
 
-  public query<TKey extends string, TFunc extends (params: any) => any>(
+  public query<TKey extends string, TFunc extends Function>(
     key: TKey,
     func: TFunc
-  ): TypedQuery<
+  ): TypedQueryBuilder<
     TQueries &
       {
         [key in typeof key]: typeof func;
       },
     TMutations
   > {
-    return new TypedQuery({
-      ...this.opts,
+    return new TypedQueryBuilder({
+      ...this.fetchers,
       queries: {
-        ...this.opts.queries,
+        ...this.fetchers.queries,
         [key]: func,
       },
-    }) as TypedQuery<
+    }) as TypedQueryBuilder<
       TQueries &
         {
           [key in typeof key]: typeof func;
@@ -38,26 +38,23 @@ class TypedQuery<TQueries, TMutations> {
     >;
   }
 
-  public mutation<
-    TKey extends Readonly<string>,
-    TFunc extends (params: any) => any
-  >(
+  public mutation<TKey extends Readonly<string>, TFunc extends Function>(
     key: TKey,
     func: TFunc
-  ): TypedQuery<
+  ): TypedQueryBuilder<
     TQueries,
     TMutations &
       {
         [key in TKey]: TFunc;
       }
   > {
-    return new TypedQuery({
-      ...this.opts,
+    return new TypedQueryBuilder({
+      ...this.fetchers,
       mutations: {
-        ...this.opts.mutations,
+        ...this.fetchers.mutations,
         [key]: func,
       },
-    }) as TypedQuery<
+    }) as TypedQueryBuilder<
       TQueries,
       TMutations &
         {
@@ -65,6 +62,24 @@ class TypedQuery<TQueries, TMutations> {
         }
     >;
   }
+
+  public merge<TBuilderInstance extends UnknownInstance>(
+    builderInstance: TBuilderInstance
+  ): TypedQueryBuilder<
+    TQueries & TBuilderInstance['fetchers']['queries'],
+    TMutations & TBuilderInstance['fetchers']['mutations']
+  > {
+    return new TypedQueryBuilder({
+      queries: {
+        ...this.fetchers.queries,
+        ...builderInstance.fetchers.queries,
+      },
+      mutations: {
+        ...this.fetchers.mutations,
+        ...builderInstance.fetchers.mutations,
+      },
+    });
+  }
 }
 
-export default TypedQuery;
+export default TypedQueryBuilder;

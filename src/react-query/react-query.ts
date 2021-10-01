@@ -12,9 +12,9 @@ import { Await, UnknownInstance } from '../types';
 export function createUseMutation<TInstance extends UnknownInstance>(
   instance: TInstance
 ) {
-  const mutationFetchers = instance.opts.mutations;
-  type MutationKeys = keyof TInstance['opts']['mutations'] & string;
-  type MutationFetchers = TInstance['opts']['mutations'];
+  const mutationFetchers = instance.fetchers.mutations;
+  type MutationKeys = keyof TInstance['fetchers']['mutations'] & string;
+  type MutationFetchers = TInstance['fetchers']['mutations'];
 
   const useMutation = <
     TKey extends MutationKeys,
@@ -37,9 +37,9 @@ export function createUseMutation<TInstance extends UnknownInstance>(
 export function createUseQuery<TInstance extends UnknownInstance>(
   instance: TInstance
 ) {
-  const queryFetchers = instance.opts.queries;
-  type QueryKeys = keyof TInstance['opts']['queries'] & string;
-  type Fetchers = TInstance['opts']['queries'];
+  const queryFetchers = instance.fetchers.queries;
+  type QueryKeys = keyof TInstance['fetchers']['queries'] & string;
+  type Fetchers = TInstance['fetchers']['queries'];
 
   // function useQuery<
   //   Key extends QueryKeys,
@@ -57,31 +57,33 @@ export function createUseQuery<TInstance extends UnknownInstance>(
   //   options?: UseQueryOptions<Data>
   // ): UseQueryResult<Data>;
 
-  function useQuery<
-    Key extends QueryKeys,
-    Data = Await<ReturnType<Fetchers[Key]>>,
-    Params = Parameters<Fetchers[Key]> extends []
-      ? never
-      : Parameters<Fetchers[Key]>
-  >(key: Key, params: Params): UseQueryResult<Data>;
+  // function useQuery<
+  //   Key extends QueryKeys,
+  //   Params extends Parameters<Fetchers[Key]> = Parameters<Fetchers[Key]>,
+  //   Data = Await<ReturnType<Fetchers[Key]>>,
+  //   Options = UseQueryOptions<Data>
+  // >(
+  //   key: Key,
+  //   params: Params,
+  //   options?: Params extends [] ? Options : Params
+  // ): UseQueryResult<Data>;
+
+  // function useQuery<
+  //   Key extends QueryKeys,
+  //   Params extends Parameters<Fetchers[Key]> = Parameters<Fetchers[Key]>,
+  //   Data = Await<ReturnType<Fetchers[Key]>>,
+  //   Options = UseQueryOptions<Data>
+  // >(key: Key, options: Options): UseQueryResult<Data>;
 
   function useQuery<
     Key extends QueryKeys,
-    Data = Await<ReturnType<Fetchers[Key]>>,
-    Options = UseQueryOptions<Data>
-  >(key: Key, options?: Options): UseQueryResult<Data>;
-
-  function useQuery<
-    Key extends QueryKeys,
-    Data = Await<ReturnType<Fetchers[Key]>>,
-    Params = Parameters<Fetchers[Key]> extends []
-      ? never
-      : Parameters<Fetchers[Key]>,
-    Options = UseQueryOptions<Data>
+    Options extends UseQueryOptions<Data>,
+    Params extends Parameters<Fetchers[Key]>,
+    Data = Await<ReturnType<Fetchers[Key]>>
   >(
     arg1: Key,
-    arg2?: Params extends never ? Options : Params,
-    arg3?: Params extends never ? Options : Options
+    arg2: Params extends [] ? Options : Params,
+    arg3?: Params extends [] ? never : Options
   ): UseQueryResult<Data> {
     const key = React.useMemo(() => arg1, [arg1]);
     const params = React.useMemo(() => (Array.isArray(arg2) ? arg2 : []), [
@@ -95,7 +97,7 @@ export function createUseQuery<TInstance extends UnknownInstance>(
     return useReactQuery(
       key,
       () => queryFetchers[key].apply(null, params),
-      options
+      options as Options
     );
   }
 
