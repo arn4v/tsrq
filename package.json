@@ -1,7 +1,7 @@
 {
   "name": "tsrq",
   "author": "Arnav Gosain",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -19,7 +19,8 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "format": "prettier --write ./src/**/*.{js,jsx,ts,tsx}"
   },
   "peerDependencies": {},
   "husky": {
@@ -30,8 +31,9 @@
   "prettier": {
     "printWidth": 80,
     "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
+    "trailingComma": "all",
+    "useTabs": true,
+    "tabWidth": 2
   },
   "module": "dist/typed-query.esm.js",
   "size-limit": [

@@ -1,2 +1,2 @@
-export * from './react-query';
-export * from './typed-query';
+export * from "./react-query";
+export * from "./typed-query";
