@@ -1,10 +1,10 @@
 {
 	"name": "tsrq",
 	"author": "Arnav Gosain",
-	"version": "0.0.4",
+	"version": "0.0.3",
 	"license": "MIT",
-	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
+	"source": "src/index.ts",
 	"files": [
 		"dist",
 		"src"
@@ -22,10 +22,7 @@
 		"analyze": "size-limit --why",
 		"format": "prettier --write ./src/**/*.{js,jsx,ts,tsx}"
 	},
-	"peerDependencies": {
-		"react": ">=16",
-		"react-query": ">=3"
-	},
+	"peerDependencies": {},
 	"husky": {
 		"hooks": {
 			"pre-commit": "tsdx lint"
@@ -38,14 +35,13 @@
 		"useTabs": true,
 		"tabWidth": 2
 	},
-	"module": "dist/tsrq.esm.js",
 	"size-limit": [
 		{
-			"path": "dist/tsrq.cjs.production.min.js",
+			"path": "dist/typed-query.cjs.production.min.js",
 			"limit": "10 KB"
 		},
 		{
-			"path": "dist/tsrq.esm.js",
+			"path": "dist/typed-query.esm.js",
 			"limit": "10 KB"
 		}
 	],
