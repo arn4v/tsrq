@@ -58,9 +58,7 @@ const useQuery = createUseQuery(builder);
 const useMutation = createUseMutation(builder);
 
 export default function TodosList() {
-	// If query requires no parameters then you must
-	// provide an empty array
-	const { data } = useQuery("todos", []);
+	const { data } = useQuery("todos");
 
 	return (
 		<ul>
@@ -72,8 +70,7 @@ export default function TodosList() {
 }
 
 export default function TodoPage({ id }: { id: string }) {
-	// Provide query parameters as array in second arg
-	const { data } = useQuery("byId", [id]);
+	const { data } = useQuery("byId", id);
 	const { mutate } = useMutation("updateTodo");
 
 	return <div>{data?.title}</div>;
@@ -131,8 +128,6 @@ export const useQuery = createUseQuery(builder);
 
 Usage:
 
-When query requires params:
-
 ```tsx
 import * as React from "react";
 import { useQuery } from "./tsrq.config";
@@ -144,27 +139,6 @@ const TodoPage = ({ id }: { id: string }) => {
 
 	return <div>{/** JSX */}</div>;
 };
-```
-
-When query doesn't require params:
-
-```tsx
-import * as React from "react";
-import { useQuery } from "./tsrq.config";
-
-export default function TodosList() {
-	// If query requires no parameters then you must
-	// provide an empty array
-	const { data } = useQuery("todos", []);
-
-	return (
-		<ul>
-			{data?.map(item => (
-				<li key={item.id}>{item.title}</li>
-			))}
-		</ul>
-	);
-}
 ```
 
 - createUseMutation
