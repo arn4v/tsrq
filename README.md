@@ -79,6 +79,97 @@ export default function TodoPage({ id }: { id: string }) {
 
 ## API Reference
 
+- createQueryBuilder
+
+Create instance:
+
+```ts
+import { createQueryBuilder } from "tsrq";
+
+const builder = createQueryBuilder();
+```
+
+Add Query to Instance:
+
+```ts
+import { createQueryBuilder } from "tsrq";
+
+const builder = createQueryBuilder().query("todos", () => {
+	return fetch("/todos").then(res => res.json());
+});
+```
+
+Add Mutation to Instance:
+
+```ts
+import { createQueryBuilder } from "tsrq";
+
+const builder = createQueryBuilder().mutation("add", (title: string) => {
+	return fetch("/todos", {
+		method: "POST",
+		body: JSON.stringify({
+			title,
+		}),
+	});
+});
+```
+
+- createUseQuery
+
+```ts
+import { createQueryBuilder, createUseQuery } from "tsrq";
+
+// Builder Code
+const builder = createQueryBuilder();
+// ...End Builder Code
+
+export const useQuery = createUseQuery(builder);
+```
+
+Usage:
+
+```tsx
+import * as React from "react";
+import { useQuery } from "./tsrq.config";
+
+const TodoPage = ({ id }: { id: string }) => {
+	const { data, isLoading } = useQuery("byId", [id]);
+
+	if (isLoading) return null;
+
+	return <div>{/** JSX */}</div>;
+};
+```
+
+- createUseMutation
+
+```ts
+import { createQueryBuilder, createUseMutation } from "tsrq";
+
+// Builder Code
+const builder = createQueryBuilder();
+// ...End Builder Code
+
+export const useMutation = createUseMutation(builder);
+```
+
+Usage:
+
+```tsx
+import * as React from "react";
+import { useMutation } from "./tsrq.config";
+
+const CreateTodoPage = () => {
+	const [title, setTitle] = React.useState("");
+	const { mutate } = useMutation("add");
+
+	const addTodo = () => {
+		mutate(title);
+	};
+	return <div>{/** JSX */}</div>;
+};
+```
+
 ## Credits
 
 - Alex Johansson (@katt) for tRPC. This library is heavily inspired by `trpc`.
