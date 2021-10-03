@@ -1,62 +1,84 @@
-# TypeScript React Query
+<h1><b><center>tsrq</center></b></h1>
 
-If you're using React Query, you can either make use of the vanilla useQuery hook from `react-query` in every component. However, as your app grows and you need to reuse some of the same queries and mutations in multiple components you would have to extract those queries into many hooks.
+- [Introduction](#introduction)
+- [Install](#install)
+- [Quick Start Example:](#quick-start-example)
+- [API Reference](#api-reference)
+- [Credits](#credits)
 
-While it's fine for a few queries, it can become cumbersome quickly if you have a complex app that's pulling data from 10s if not 100s of endpoints.
+## Introduction
+
+When using React Query, for the same query, you can either copy paste the code into different components or abstract it into a custom hook. The first one is just bad practice and the second method become unmanageable very quickly as your app (and # of endpoints) grows.
 
 With TSRQ, you only define you write code for your queries and mutations once and reuse them wherever you want.
 
-## Example usage:
+## Install
+
+npm:
+
+```bash
+npm i -S tsrq react-query
+```
+
+yarn:
+
+```bash
+yarn add tsrq react-query
+```
+
+## Quick Start Example:
 
 ```tsx
 import {
-  createQueryBuilder,
-  createUseQuery,
-  createUseMutation,
-} from 'typed-query';
+	createQueryBuilder,
+	createUseQuery,
+	createUseMutation,
+} from "typed-query";
 
 interface ITodo {
-  id: string;
-  title: string;
+	id: string;
+	title: string;
 }
 
 const builder = createQueryBuilder()
-  .query('todos', async () => {
-    return await fetch('/todos').then(res => res.json() as Array<ITodo>);
-  })
-  .query('byId', async (id: string) => {
-    return await fetch(`/todos/${id}`).then(res => res.json() as ITodo);
-  })
-  .mutation('updateTodo', async ({ id, title }: ITodo) => {
-    return await fetch(`/todos/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ title }),
-    }).then(res => res.json() as ITodo);
-  });
+	.query("todos", async () => {
+		return await fetch("/todos").then(res => res.json() as Array<ITodo>);
+	})
+	.query("byId", async (id: string) => {
+		return await fetch(`/todos/${id}`).then(res => res.json() as ITodo);
+	})
+	.mutation("updateTodo", async ({ id, title }: ITodo) => {
+		return await fetch(`/todos/${id}`, {
+			method: "PATCH",
+			body: JSON.stringify({ title }),
+		}).then(res => res.json() as ITodo);
+	});
 
 const useQuery = createUseQuery(builder);
 const useMutation = createUseMutation(builder);
 
 export default function TodosList() {
-  const { data } = useQuery('todos');
+	const { data } = useQuery("todos");
 
-  return (
-    <ul>
-      {data?.map(item => (
-        <li key={item.id}>{item.title}</li>
-      ))}
-    </ul>
-  );
+	return (
+		<ul>
+			{data?.map(item => (
+				<li key={item.id}>{item.title}</li>
+			))}
+		</ul>
+	);
 }
 
 export default function TodoPage({ id }: { id: string }) {
-  const { data } = useQuery('byId', id);
-  const { mutate } = useMutation('updateTodo');
+	const { data } = useQuery("byId", id);
+	const { mutate } = useMutation("updateTodo");
 
-  return <div>{data?.title}</div>;
+	return <div>{data?.title}</div>;
 }
 ```
 
+## API Reference
+
 ## Credits
 
-- Alex Katt for tRPC. This project is heavily inspired by `trpc`.
+- Alex Johansson (@katt) for tRPC. This library is heavily inspired by `trpc`.
