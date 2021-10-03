@@ -172,4 +172,4 @@ const CreateTodoPage = () => {
 
 ## Credits
 
-- Alex Johansson (@katt) for tRPC. This library is heavily inspired by `trpc`. TSRQ QueryBuilder implementation is similar to TRPC's Router implementation.
+- Alex Johansson (@katt) for tRPC. This library is heavily inspired by `trpc`.
