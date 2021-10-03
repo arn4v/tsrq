@@ -1,4 +1,7 @@
-import { UnknownInstance } from "./types";
+/**
+ * @internal
+ */
+export type UnknownInstance = QueryBuilder<any, any>;
 
 /**
  * @internal

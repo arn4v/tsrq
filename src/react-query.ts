@@ -6,7 +6,12 @@ import {
 	UseQueryOptions,
 	UseQueryResult,
 } from "react-query";
-import { Await, UnknownInstance } from "./types";
+import { UnknownInstance } from "./builder";
+
+/**
+ * @internal
+ */
+export type Await<T> = T extends Promise<infer U> ? U : T;
 
 export function createUseMutation<TInstance extends UnknownInstance>(
 	instance: TInstance,
@@ -49,7 +54,8 @@ export function createUseQuery<TInstance extends UnknownInstance>(
 		return useReactQuery(
 			key,
 			() => queryFetchers[key].apply(null, params),
-			options as Options,
+			// @ts-ignore
+			options,
 		);
 	}
 
