@@ -1,13 +1,12 @@
-import * as React from "react";
 import {
-	useQuery as useReactQuery,
+	MutationFunction,
 	useMutation as useReactMutation,
+	UseMutationOptions,
+	useQuery as useReactQuery,
 	UseQueryOptions,
 	UseQueryResult,
-	UseMutationOptions,
-	MutationFunction,
 } from "react-query";
-import { Await, UnknownInstance } from "../types";
+import { UnknownInstance, Await } from "..";
 
 export function createUseMutation<TInstance extends UnknownInstance>(
 	instance: TInstance,
@@ -46,24 +45,11 @@ export function createUseQuery<TInstance extends UnknownInstance>(
 		Options extends UseQueryOptions<Data>,
 		Params extends Parameters<Fetchers[Key]>,
 		Data = Await<ReturnType<Fetchers[Key]>>
-	>(
-		arg1: Key,
-		arg2: Params extends [] ? Options : Params,
-		arg3?: Params extends [] ? never : Options,
-	): UseQueryResult<Data> {
-		const key = React.useMemo(() => arg1, [arg1]);
-		const params = React.useMemo(() => (Array.isArray(arg2) ? arg2 : []), [
-			arg2,
-		]);
-		const options = React.useMemo(
-			() => (!!arg3 && Array.isArray(arg2) ? arg3 : arg2),
-			[arg2, arg3],
-		);
-
-		return useReactQuery(
+	>(key: Key, params: Params, options?: Options): UseQueryResult<Data> {
+		return useReactQuery<Data, unknown, Data, Key>(
 			key,
 			() => queryFetchers[key].apply(null, params),
-			options as Options,
+			options ?? {},
 		);
 	}
 

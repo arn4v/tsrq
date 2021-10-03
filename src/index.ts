@@ -1,4 +1,5 @@
-import { UnknownInstance } from "./types";
+export type Await<T> = T extends Promise<infer U> ? U : T;
+export type UnknownInstance = QueryBuilder<any, any>;
 
 class QueryBuilder<TQueries, TMutations> {
 	readonly fetchers: Readonly<{
