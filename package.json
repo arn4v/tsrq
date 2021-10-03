@@ -24,7 +24,7 @@
 	},
 	"peerDependencies": {
 		"react": ">=16",
-		"react-query": ">=3 <=3.25.0"
+		"react-query": ">=3"
 	},
 	"husky": {
 		"hooks": {
@@ -64,7 +64,9 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
-		"react": "latest",
-		"react-query": "^3.24.0"
+		"microbundle": "^0.13.3",
+		"react": "^17.0.2",
+		"react-query": "^3.24.5",
+		"swr": "^1.0.1"
 	}
 }
